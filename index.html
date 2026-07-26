@@ -9,26 +9,75 @@
     *, *::before, *::after { box-sizing: border-box; }
 
     body {
-      background-color: white;
       font-family: Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 24px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background-color 0.3s;
+      background-color: white;
     }
 
+    body.bg-blue { background-color: #3b82f6; }
+    body.bg-pink { background-color: #ec4899; }
+
     h1 {
-      margin: 0 0 32px;
+      margin: 0 0 24px;
       font-size: clamp(1.4rem, 4vw, 2rem);
     }
 
-    #chart-container {
-      width: 100%;
-      max-width: 720px;
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      font-size: 14px;
+      font-weight: 600;
     }
 
-    #chart-container svg {
+    #bg-toggle {
+      width: 52px;
+      height: 28px;
+      background: #3b82f6;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.3s;
+      padding: 0;
+    }
+
+    #bg-toggle[aria-checked="false"] {
+      background: #ec4899;
+    }
+
+    #bg-toggle .thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+      pointer-events: none;
+    }
+
+    #bg-toggle[aria-checked="false"] .thumb {
+      transform: translateX(24px);
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      width: 100%;
+      max-width: 720px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+
+    .chart-card svg {
       width: 100%;
       height: auto;
       display: block;
@@ -61,11 +110,31 @@
     }
   </style>
 </head>
-<body>
+<body class="bg-blue">
   <h1>Hello, World!</h1>
-  <div id="chart-container"></div>
+
+  <div class="toggle-container">
+    <span>Blue</span>
+    <button id="bg-toggle" role="switch" aria-checked="true" aria-label="Toggle background color">
+      <span class="thumb"></span>
+    </button>
+    <span>Pink</span>
+  </div>
+
+  <div class="chart-card">
+    <svg id="chart"></svg>
+  </div>
 
   <script>
+    const toggle = document.getElementById('bg-toggle');
+
+    toggle.addEventListener('click', () => {
+      const isBlue = document.body.classList.contains('bg-blue');
+      document.body.classList.toggle('bg-blue', !isBlue);
+      document.body.classList.toggle('bg-pink', isBlue);
+      toggle.setAttribute('aria-checked', String(!isBlue));
+    });
+
     const data = [
       { label: "Jan", value: 42 },
       { label: "Feb", value: 58 },
@@ -82,8 +151,7 @@
     const width = totalWidth - margin.left - margin.right;
     const height = totalHeight - margin.top - margin.bottom;
 
-    const svg = d3.select("#chart-container")
-      .append("svg")
+    const svg = d3.select("#chart")
       .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`)
       .attr("preserveAspectRatio", "xMidYMid meet")
       .append("g")
