@@ -4,8 +4,106 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hello World</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <style>
+    body {
+      background-color: white;
+      font-family: Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    h1 {
+      margin-bottom: 32px;
+    }
+
+    .bar rect {
+      fill: steelblue;
+      transition: fill 0.2s;
+    }
+
+    .bar rect:hover {
+      fill: #2a5f8f;
+    }
+
+    .bar text {
+      fill: white;
+      font-size: 12px;
+      text-anchor: middle;
+    }
+
+    .axis text {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 13px;
+    }
+
+    .axis path,
+    .axis line {
+      stroke: #ccc;
+    }
+  </style>
 </head>
-<body style="background-color: green;">
+<body>
   <h1>Hello, World!</h1>
+  <svg id="chart"></svg>
+
+  <script>
+    const data = [
+      { label: "Jan", value: 42 },
+      { label: "Feb", value: 58 },
+      { label: "Mar", value: 75 },
+      { label: "Apr", value: 63 },
+      { label: "May", value: 91 },
+      { label: "Jun", value: 84 },
+      { label: "Jul", value: 110 },
+    ];
+
+    const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+    const width = 600 - margin.left - margin.right;
+    const height = 400 - margin.top - margin.bottom;
+
+    const svg = d3.select("#chart")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const x = d3.scaleBand()
+      .domain(data.map(d => d.label))
+      .range([0, width])
+      .padding(0.25);
+
+    const y = d3.scaleLinear()
+      .domain([0, d3.max(data, d => d.value) * 1.1])
+      .range([height, 0]);
+
+    svg.append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(x));
+
+    svg.append("g")
+      .attr("class", "axis")
+      .call(d3.axisLeft(y).ticks(6));
+
+    const bars = svg.selectAll(".bar")
+      .data(data)
+      .enter()
+      .append("g")
+      .attr("class", "bar");
+
+    bars.append("rect")
+      .attr("x", d => x(d.label))
+      .attr("y", d => y(d.value))
+      .attr("width", x.bandwidth())
+      .attr("height", d => height - y(d.value));
+
+    bars.append("text")
+      .attr("x", d => x(d.label) + x.bandwidth() / 2)
+      .attr("y", d => y(d.value) + 18)
+      .text(d => d.value);
+  </script>
 </body>
 </html>
