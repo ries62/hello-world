@@ -6,17 +6,32 @@
   <title>Hello World</title>
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
     body {
       background-color: white;
       font-family: Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 24px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px;
     }
 
     h1 {
-      margin-bottom: 32px;
+      margin: 0 0 32px;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+    }
+
+    #chart-container {
+      width: 100%;
+      max-width: 720px;
+    }
+
+    #chart-container svg {
+      width: 100%;
+      height: auto;
+      display: block;
     }
 
     .bar rect {
@@ -32,6 +47,7 @@
       fill: white;
       font-size: 12px;
       text-anchor: middle;
+      pointer-events: none;
     }
 
     .axis text {
@@ -47,7 +63,7 @@
 </head>
 <body>
   <h1>Hello, World!</h1>
-  <svg id="chart"></svg>
+  <div id="chart-container"></div>
 
   <script>
     const data = [
@@ -61,12 +77,15 @@
     ];
 
     const margin = { top: 20, right: 20, bottom: 40, left: 50 };
-    const width = 600 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
+    const totalWidth = 600;
+    const totalHeight = 400;
+    const width = totalWidth - margin.left - margin.right;
+    const height = totalHeight - margin.top - margin.bottom;
 
-    const svg = d3.select("#chart")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
+    const svg = d3.select("#chart-container")
+      .append("svg")
+      .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`)
+      .attr("preserveAspectRatio", "xMidYMid meet")
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
